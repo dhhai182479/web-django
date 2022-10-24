@@ -1,0 +1,151 @@
+{% extends 'base/__base.html' %}
+
+{% block title %}
+	Chi tiết sản phẩm
+{% endblock title %}
+
+{% block content %}
+{% load static %}
+{% load humanize %}
+{% load custom_filter %}
+	<div class="col-sm-8 col-sm-offset-2">
+		<div class="product-details"><!--product-details-->
+			<div class="col-sm-5">
+				<div class="view-product">
+					{% if product_data.image|first in 'images' %}
+                        <img src="{% static product_data.image %}" alt="" />
+                    {% else %}
+                        <img src="{{ product_data.image }}" alt="" />
+                    {% endif %}
+				</div>
+				<div id="similar-product" class="carousel slide" data-ride="carousel">
+					<ol class="carousel-indicators">
+						{% for product_image in product_data.productimage_set.all %}
+							<li data-target="#slider-carousel" data-slide-to="{{ forloop.counter0 }}" {% if forloop.counter0 == 0 %} class="active" {% endif %}></li>
+						{% endfor %}
+					</ol>
+					
+					<div class="carousel-inner">
+						{% for product_image in product_data.productimage_set.all %}
+							<div class="item {% if forloop.counter0 == 0 %} active {% endif %}">
+								<div class="col-sm-6 col-sm-offset-2">
+									<img src="{% static product_image.img_path %}" class="girl img-responsive" alt="" />
+								</div>
+							</div>
+						{% endfor %}	
+					</div>
+					
+					<a href="#similar-product" class="left control-carousel hidden-xs" data-slide="prev">
+						<i class="fa fa-angle-left"></i>
+					</a>
+					<a href="#similar-product" class="right control-carousel hidden-xs" data-slide="next">
+						<i class="fa fa-angle-right"></i>
+					</a>
+				</div>				
+			</div>
+			
+			<div class="col-sm-7">
+				<div class="product-information"><!--/product-information-->
+					<img src="{% static 'images/product-details/new.jpg" class="newarrival' %}" alt="" />
+					<h2>{{ product_data.name }}</h2>
+					<p>Web ID: 1089{{ product_data.id }}</p>
+					<img src="{% static 'images/product-details/rating.png' %}" alt="" />
+					<br>
+					<span>
+						<span>
+							{% if product_data.id|check_product_sale %}
+								{{ product_data.id|get_price_sale|intcomma}} ₫
+								<h4 style="text-decoration: line-through;">{{ product_data.price|intcomma}} ₫</h4>
+							{% else %}
+								{{ product_data.price|intcomma}} ₫
+						{% endif %}
+						</span>
+						<label>Quantity:1</label>
+						<br>
+						<a  data-href="{% if user.is_authenticated %} {% url 'add_product_to_cart' product_data.id %} {% else %} {% url 'login_user' %} {% endif %}"  
+    						class="btn btn-default add-to-cart"
+                    		data-logged-user="{{ user.is_authenticated }}">
+                    	<i class="fa fa-shopping-cart"></i>
+                    		Thêm vào giỏ hàng
+                		</a>
+					</span>
+					<p><b>Availability:</b> In Stock</p>
+					<p><b>Condition:</b> New</p>
+					<p><b>Brand:</b> {{ product_data.brand.name }}</p>
+					<a href=""><img src="{% static 'images/product-details/share.png' %}" class="share img-responsive"  alt="" /></a>
+				</div><!--/product-information-->
+			</div>
+		</div><!--/product-details-->
+		
+		<div class="category-tab shop-details-tab"><!--category-tab-->
+			<div class="col-sm-12">
+				<ul class="nav nav-tabs">
+					<li><a href="#details" data-toggle="tab">Details</a></li>
+					<li class="active"><a href="#reviews" data-toggle="tab">Reviews (5)</a></li>
+				</ul>
+			</div>
+			<div class="tab-content">
+				<div class="tab-pane fade active in" id="details" >
+					<div class="col-sm-12">
+						{{ product_data.detail|safe }}
+					</div>
+				</div>
+				<div class="tab-pane fade" id="reviews" >
+					<div class="col-sm-12">
+						<ul>
+							<li><a href=""><i class="fa fa-user"></i>EUGEN</a></li>
+							<li><a href=""><i class="fa fa-clock-o"></i>12:41 PM</a></li>
+							<li><a href=""><i class="fa fa-calendar-o"></i>31 DEC 2014</a></li>
+						</ul>
+						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+						<p><b>Write Your Review</b></p>
+						
+						<form action="#">
+							<span>
+								<input type="text" placeholder="Your Name"/>
+								<input type="email" placeholder="Email Address"/>
+							</span>
+							<textarea name="" ></textarea>
+							<b>Rating: </b> <img src="{% static 'images/product-details/rating.png' %}" alt="" />
+							<button type="button" class="btn btn-default pull-right">
+								Submit
+							</button>
+						</form>
+					</div>
+				</div>
+				
+			</div>
+		</div><!--/category-tab-->
+		
+	</div>
+
+
+	<script>
+		$(document).ready(function(){
+			$(".add-to-cart").each(function() {
+				$(this).click(function(){
+					let url = $(this).data('href');
+					if ($(this).data('logged-user')=="True"){
+						$.ajax({
+							type: "GET",
+							url: url,
+							success: function(data) {
+								$("sup.badge").text(data.quantity);
+								$("#alert-add-product").show();
+								setTimeout(function() {
+									$("#alert-add-product").hide();
+								}, 1000);
+							},
+							error: function(xhr, textStatus, errorThrown) {
+								console.log(errorThrown);
+							}
+						})
+					}
+					else {
+						window.location.href=url;
+					}
+				});
+			});
+		});
+	</script>
+{% endblock content %}

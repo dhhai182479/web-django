@@ -1,0 +1,47 @@
+{% load static %}
+{% load custom_filter %}
+{% load humanize %}
+
+<style>
+    .lable_title{
+        height: 40px;
+        overflow: hidden;
+        white-space: nowrap; 
+        text-overflow: ellipsis; 
+}
+</style>
+<div class="col-sm-4">
+    <div class="product-image-wrapper">
+        <div class="single-products">
+            <div class="productinfo text-center">
+                <a class="thumbnail" href="{% url 'view_product' product_id=product.id %}">
+                    {% if product.image|first in 'i' %} <!-- ĐƯờng dẫn ở trong máy-->
+                        <img src="{% static product.image %}" alt="{{ product.name }}" />
+                    {% else %}  <!-- ĐƯờng dẫn online-->
+                        <img src="{{ product.image }}" alt="{{ product.name }}" />
+                    {% endif %}
+                    {% if product.id|check_product_sale %}
+                        <h6 style="position: absolute; bottom:38%; left: 33%; text-decoration: line-through; color:#acb0c9;">{{ product.price|intcomma }} ₫</h6>
+                        <h2>{{ product.id|get_price_sale|intcomma}} ₫</h2>
+                    {% else %}
+                        <h2>{{ product.price|intcomma}} ₫</h2>
+                    {% endif %}
+                    <p class="lable_title">{{ product.name }}</p>
+                </a>	 
+                <a  data-href="{% if user.is_authenticated %}
+                        {% url 'add_product_to_cart' product_id=product.id %}
+                    {% else %}
+                        {% url 'login_user' %}
+                    {% endif %}"  
+                    class="btn btn-default add-to-cart"
+                    data-logged-user="{{ user.is_authenticated }}">
+                    <i class="fa fa-shopping-cart"></i>
+                    Thêm vào giỏ hàng
+                </a>
+            </div>
+            {% if product.id|check_product_sale %}
+                <span style="background-color: #FE980F; color:white;" class="new">ㅤSALE {{ product.id|get_product_discount }}%ㅤ</span>
+            {% endif %}
+        </div>
+    </div>
+</div>

@@ -1,0 +1,34 @@
+<h2>Danh mục sản phẩm</h2>
+<div class="panel-group category-products" id="accordian"><!--category-productsr-->
+    {% for category in categories %}
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a class="hover" data-toggle="collapse" data-parent="#accordian" href="#category-{{ category.id }}">	
+                        {% if category.category_set.exists %}
+                            <span class="badge pull-right">
+                                <i class="fa fa-plus"></i>
+                            </span>
+                            {{ category.name }}
+                        {% else %}
+                            {{ category.name }}
+                        {% endif %}
+                    </a>
+                </h4>
+            </div>
+            {% if category.category_set.exists %}
+                <div id="category-{{ category.id }}" class="panel-collapse {%if category.name == category_display.category_parent.name%} in {%else%} collapse {%endif%}">
+                    <div class="panel-body">
+                        <ul>
+                            {% for category_child in category.category_set.all %}
+                                <li class="{% if category_child.name == category_display.name %} filtered {% endif %} hover">
+                                    <a href="?category={{category_child.name}}">{{ category_child.name }}</a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            {% endif %}		
+        </div>
+    {% endfor %}
+</div><!--/category-products-->

@@ -1,0 +1,111 @@
+{% extends 'base/__base.html' %}
+
+{% block title %}
+	Giỏ hàng
+{% endblock title %}
+
+{% block content %}
+{% load static %}
+{% load humanize %}
+{% load custom_filter %}
+<style>
+	.lable-title{
+        width: 300px;
+        overflow: hidden;
+        white-space: nowrap; 
+        text-overflow: ellipsis; 
+	}
+	.a {
+		text-overflow: ellipsis;
+	}
+	.image {
+		width: 150px;
+	}
+	#total{
+		background: #e1dfda;
+	}
+</style>
+	<section id="cart_items">
+		<div class="container">
+
+			<div class="table-responsive cart_info">
+				<table class="table table-condensed">
+					<thead>
+						<tr class="cart_menu">
+							<td class="image">Sản phẩm</td>
+							<td class="description"></td>
+							<td class="price">Đơn giá</td>
+							<td class="quantity">Số lượng</td>
+							<td class="total">Thành tiền</td>
+							<td></td>
+						</tr>
+					</thead>
+					<tbody>		
+						{% if message %}
+							<td colspan="6"> <h4 style="text-align:center;">{{ message }}</h4></td>
+						{% else %}
+							{% for orderdetail in data_orderdetail %}
+								<tr>
+										<td class="cart_product">
+											<a href="{% url 'view_product' product_id=orderdetail.product.id  %}">
+												{% if orderdetail.product.image|first in 'images' %}
+													<img src="{% static orderdetail.product.image %}" alt="" style="width:100px"/>
+												{% else %}
+													<img src="{{ orderdetail.product.image }}" alt="" style="width:100px"/>
+												{% endif %}
+											</a>
+										</td>
+										<td class="cart_description">
+											<h4 class="lable-title">
+												<a class="a" href="{% url 'view_product' orderdetail.product.id  %}">
+													{{ orderdetail.product.name }}
+												</a>
+											</h4>
+											<p>Web ID: 108{{ orderdetail.product.id }}</p>
+										</td>
+									<td class="cart_price">
+										<p>
+											{% if orderdetail.product.id|check_product_sale %}
+												{{ orderdetail.product.id|get_price_sale|intcomma }} ₫
+												{% else %}
+												{{ orderdetail.product.price|intcomma }} ₫
+											{% endif %}
+										</p>
+										
+									</td>
+									<td class="cart_quantity">
+										<div class="cart_quantity_button">
+											<a class="cart_quantity_down" href="{% url 'change_product_quantity' action='decrease' product_id=orderdetail.product.id %}"> - </a>
+											<input class="cart_quantity_input" disabled type="text" name="quantity" value="{{ orderdetail.quantity }}" autocomplete="off" size="2">
+											<a class="cart_quantity_up" href="{% url 'change_product_quantity' action='increase' product_id=orderdetail.product.id %}"> + </a>
+										</div>
+									</td>
+									<td class="cart_total">
+										<p class="cart_total_price">{{ orderdetail.amount|intcomma }} ₫</p>
+									</td>
+									<td class="cart_delete">
+										<a class="cart_quantity_delete" href="{% url 'delete_product_quantity' product_id=orderdetail.product.id %}"><i class="fa fa-times"></i></a>
+									</td>
+								</tr>							
+							{% endfor %}
+							<tr id="total">
+								<td colspan="4">
+									<h4 style="text-align:right;">Tổng tiền: </h4>
+								</td>
+								<td colspan="2">
+									<h4 style="color:rgba(255, 0, 0, 0.659); font-size:36px">{{ total_amount|intcomma }} ₫</h4>
+								</td>
+							<tr>
+								<td colspan="4"></td>
+								<td colspan="2">
+									<a href="{% url 'checkout' %}" class="btn btn-default btn-block btn-large get" style="font-size: 20px;">Xác nhận</a>
+								</td>
+							</tr>
+						{% endif %}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</section> <!--/#cart_items-->
+	
+{% endblock content %}

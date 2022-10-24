@@ -1,0 +1,14 @@
+<div class="brands_products"><!--brands_products-->
+    <h2>Thương hiệu</h2>
+    <div class="brands-name">
+        <ul class="nav nav-pills nav-stacked">
+            {% for brand in brands %}
+                <li class="{% if brand.name == brand_display.name %} filtered {% endif %} hover">
+                    <a href="?brand={{ brand.name }}">
+                        <span class="pull-right">{% if brand.product_set.count != 0 %} ({{brand.product_set.count}}) {% endif %}</span>{% if brand.product_set.count != 0 %} {{ brand.name }} {% endif %}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div><!--/brands_products-->

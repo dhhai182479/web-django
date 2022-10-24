@@ -1,0 +1,208 @@
+
+{% extends 'base/__base.html' %}
+{% block title %}
+	Trang chủ
+{% endblock title %}
+
+{% block content %}
+{% load static %}
+<script src="{% static 'js/jquery-3.6.0.min.js' %}"></script>
+{% load humanize %}
+{% load custom_filter %}
+<style>
+	li.filtered {
+		background-color: #fe960fa9;
+	}
+	a.hover:hover, li.hover:hover{
+		background-color: #fe960fa9;
+	}
+	.thumbnail img {
+		transition-duration: 0.5s;
+		/* Safari & Google Chrome */
+		-webkit-transition-duration: 0.5s; 
+	}		 
+	.thumbnail img:hover {
+		transform: scale(1.1);
+		/* Safari & Google Chrome */
+		-webkit-transform: scale(1.05);
+		cursor: pointer; 
+	}
+	#alert-add-product {
+		background-color: rgba(0,0,0,0.26);
+		color: aliceblue;
+		width: 350px;
+		position: fixed;
+		z-index: 1000;
+		top: 50%;
+		left: 50%;
+		border-radius: 20px;
+		display: none;
+	}
+	.pricing {
+		position: absolute;
+		top: 95%;
+		left: 50%;
+		height: 30px;
+		width: 150px;
+		border-radius: 50%;
+		justify-self: center;
+		text-align: center;
+		background-color: rgba(255, 221, 0, 0.471);
+		font-size: 20px;
+	}
+</style>
+	<section id="slider"><!--slider-->
+		<div class="container">
+			<div class="row">
+				<div class="col-sm-12">
+					<div id="slider-carousel" class="carousel slide" data-ride="carousel">
+						<ol class="carousel-indicators">
+							{% for promotion in product_promotions %}
+								<li data-target="#slider-carousel" data-slide-to="{{forloop.counter0}}" {% if forloop.counter0 == 0 %} class="active" {% endif %}></li>
+							{% endfor %}
+						</ol>
+						
+						<div class="carousel-inner">
+							{% for promotion in product_promotions %}
+								<div class="item {% if forloop.counter0 == 0 %} active {% endif %}">
+									<div class="col-sm-6">
+										<h1><span>Django</span> Oneline-Shop</h1>
+										<h2>{{ promotion.product.name }}</h2>
+										<p>đây là đài tiếng nói Việt Nam phát thanh từ Hà Nội thủ đô nước Cộng hòa xã hội chủ nghĩa Việt Nam </p>
+										<button type="button" class="btn btn-default get"><a href="{% url 'view_product' product_id=promotion.product.id %}">Mua ngay</a></button>
+									</div>
+									<div class="col-sm-6">
+										<img src="{% if promotion.product.image|first in 'images' %} {% static promotion.product.image %} {% else %} {{ promotion.product.image }} {% endif %}" class="girl img-responsive" alt="" />
+										<span class="pricing">
+											Giảm {{ promotion.discount }}%
+										</span>
+									</div>
+								</div>				
+							{% endfor %}
+						</div>
+						
+						<a href="#slider-carousel" class="left control-carousel hidden-xs" data-slide="prev">
+							<i class="fa fa-angle-left"></i>
+						</a>
+						<a href="#slider-carousel" class="right control-carousel hidden-xs" data-slide="next">
+							<i class="fa fa-angle-right"></i>
+						</a>
+					</div>
+					
+				</div>
+			</div>
+		</div>
+	</section><!--/slider-->
+
+	<section>
+		<div class="container">
+			<div class="row">
+				<div class="col-sm-3">
+					<div class="left-sidebar">
+
+						{% include 'common/categories.html' %}
+					
+						{% include 'common/brands.html' %}
+						
+						<div class="price-range"><!--price-range-->
+							<h2>Price Range</h2>
+							<div class="well text-center">
+								<input type="text" class="span2" value="" data-slider-min="{{ minimum_price }}" data-slider-max="{{ maximum_price}}" data-slider-step="10000" data-slider-value="[{{ minimum_price}},{{ maximum_price}}]" id="sl2" ><br />
+								<b class="pull-left">{{ minimum_price|intcomma }}</b> <b class="pull-right">{{ maximum_price|intcomma}}</b>
+							</div>
+						</div><!--/price-range-->
+						
+						<div class="shipping text-center"><!--shipping-->
+							<img src="{% static 'images/home/shipping.jpg' %}" alt="" />
+						</div><!--/shipping-->
+					
+					</div>
+				</div>
+				
+				<div class="col-sm-9 padding-right">
+					<div class="features_items"><!--features_items-->
+						<h2 class="title text-center">Sản Phẩm</h2>
+						{% for product in page_obj %}
+							{% include 'product/product-item.html' %}
+						{% endfor %}
+
+					</div><!--features_items-->
+					
+					<nav aria-label="Page navigation example">
+						<ul class="pagination">
+							{% if page_obj.has_previous %}
+								<li class="page-item">
+									<a class="page-link" href="?page={{ page_obj.previous }}"><</a>
+								</li>
+							{% else %}
+								<li class="page-item disabled">
+									<a class="page-link"><</a>
+								</li>
+							{% endif %}
+
+							{% for page in page_obj.paginator.num_pages|make_range %}
+								<li class="page-item {% if page == page_obj.page_number %} active {% endif %}">
+									<a class="page-link" href="?page={{page}}">{{ page }}</a>
+								</li>
+							{% endfor %}
+							
+							{% if page_obj.has_next %}
+								<li class="page-item">
+									<a class="page-link" href="?page={{ page_obj.next_page_number }}">></a>
+								</li>
+							{% else %}
+								<li class="page-item disabled">
+									<a class="page-link">></a>
+								</li>
+							{% endif %}
+						</ul>
+					  </nav>
+				
+
+					
+					<div id="alert-add-product">
+						<h1  style="font-size:400%; text-align: center;" ><i class="bi bi-check-circle-fill"></i></h1>
+						<h3 id="content" style="text-align: center;">
+							Thêm vào giỏ hàng thành công
+						</h3>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+<script>
+	$(document).ready(function(){
+		$(".add-to-cart").each(function() {
+			$(this).click(function(){
+				let url = $(this).data('href');
+				if ($(this).data('logged-user')=="True"){
+					$.ajax({
+						type: "GET",
+						url: url,
+						success: function(data) {
+							$("sup.badge").text(data.quantity);
+							$("#alert-add-product").show();
+							setTimeout(function() {
+								$("#alert-add-product").hide();
+							}, 1000);
+						},
+						error: function(xhr, textStatus, errorThrown) {
+							console.log(errorThrown);
+						}
+					})
+				}
+				else {
+					window.location.href=url;
+				}
+			});
+		});
+	});
+</script>
+
+{% endblock content %}
+
+
+	
+
+  

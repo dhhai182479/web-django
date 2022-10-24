@@ -1,0 +1,84 @@
+{% extends 'base/__base.html' %}
+{% block title %}
+    Đăng kí người dùng
+{% endblock title %}
+
+{% block content %}
+    {% load static %}
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-8">
+                <img class="img-fluid" src="{% static 'images/a.jpeg' %}" alt="">
+            </div>
+            <div class="col-sm-4">
+                <form action="" method="post">
+                    {% csrf_token %}
+                    {% for field in form  %}
+                        <div class="form-group {% if field.errors %} is-invalid {% else %} is-valid {% endif %}">
+                            {{ field.label }}
+                            {{ field }}
+                            {% if field.errors %}
+                                {% for error in field.errors %}
+                                    <div style="display: block;" class="invalid-feedback">
+                                        {{error}}
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    <input type="submit" class="btn btn-success btn-lg btn-block" value="Register">
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $("#id_username").change(function() {
+                $.ajax({
+                    type: "POST",
+                    url: "{% url 'validate_username' %}",
+                    data: {
+                        username: $(this).val(),
+                        csrfmiddlewaretoken: "{{ csrf_token }}"
+                    },
+                    success: function(data) {
+                        $("#id_username").addClass('is-valid').removeClass('is-invalid');
+                        $("#id_username").parent().find("div").remove();
+                        $("#id_username").parent().append(`<div class='invalid-feedback'>${data.message}</div>`);
+                    },
+                    error: function(xhr, textStatus, errorThrown) {
+                        $("#id_username").addClass('is-invalid').removeClass('is-valid');
+                        $("#id_username").parent().find("div").remove(); 
+                        $("#id_username").parent().append(`<div class='invalid-feedback'>${xhr.responseJSON.message}</div>`);
+                    }
+                })
+            });
+        });
+    </script>
+
+    <script>
+        $(document).ready(function() {
+            $("#id_email").change(function() {
+                $.ajax({
+                    type: "POST",
+                    url: "{% url 'validate_email' %}",
+                    data: {
+                        username: $(this).val(),
+                        csrfmiddlewaretoken: "{{ csrf_token }}"
+                    },
+                    success: function(data) {
+                        $("#id_email").addClass('is-valid').removeClass('is-invalid');
+                        $("#id_email").parent().find("div").remove();
+                        $("#id_email").parent().append(`<div class='invalid-feedback'>${data.message}</div>`);
+                    },
+                    error: function(xhr, textStatus, errorThrown) {
+                        $("#id_email").addClass('is-invalid').removeClass('is-valid');
+                        $("#id_email").parent().find("div").remove(); 
+                        $("#id_email").parent().append(`<div class='invalid-feedback'>${xhr.responseJSON.message}</div>`);
+                    }
+                })
+            });
+        });
+    </script>
+{% endblock content %}

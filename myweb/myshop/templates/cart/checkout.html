@@ -1,0 +1,103 @@
+{% extends 'base/__base.html' %}
+
+{% block title %}
+	Thanh toán
+{% endblock title %}
+
+{% block content %}
+{% load static %}
+{% load custom_filter %}
+{% load humanize %}
+<style>
+	.image {
+		width: 150px;
+	}
+	.lable-title{
+        width: 300px;
+        overflow: hidden;
+        white-space: nowrap; 
+        text-overflow: ellipsis; 
+	}
+	.a {
+		text-overflow: ellipsis;
+	}
+</style>
+	<section id="cart_items">
+		<div class="container">
+
+			<div class="register-req">
+				<p>Please use Register And Checkout to easily get access to your order history, or use Checkout as Guest</p>
+			</div><!--/register-req-->
+
+			<div class="shopper-informations">
+				<div class="row">
+					<div class="form-one">
+						<form action="" method="POST">
+							{% csrf_token %}
+							<input name="phone" type="text" placeholder="Số điện thoại">
+							<input name="address" type="text" placeholder="Địa chỉ">
+							<button class="btn btn-default btn-block btn-large get" type="submit">Thanh toán</button>
+						</form>
+					</div>
+				</div>
+			</div>
+			<div class="review-payment">
+				<h2>Chi tiết đơn hàng</h2>
+			</div>
+
+			<div class="table-responsive cart_info">
+				<table class="table table-condensed">
+					<thead>
+						<tr class="cart_menu">
+							<td class="image">Sản phẩm</td>
+							<td class="description"></td>
+							<td class="price">Đơn giá</td>
+							<td class="quantity">Số lượng</td>
+							<td class="total">Tổng tiền</td>
+						</tr>
+					</thead>
+					<tbody>
+					{% for orderdetail in data_orderdetail %}
+							<tr>
+								<td class="cart_product">
+									<a href="{% url 'view_product' product_id=orderdetail.product.id  %}">
+										{% if orderdetail.product.image|first in 'images' %}
+											<img src="{% static orderdetail.product.image %}" alt="" style="width:100px"/>
+										{% else %}
+											<img src="{{ orderdetail.product.image }}" alt="" style="width:100px"/>
+										{% endif %}
+									</a>
+								</td>
+								<td class="cart_description">
+									<h4 class="lable-title">
+										<a class="a" href="{% url 'view_product' orderdetail.product.id  %}">
+											{{ orderdetail.product.name }}
+										</a>
+									</h4>
+									<p>Web ID: 108{{ orderdetail.product.id }}</p>
+								</td>
+								<td class="cart_price">
+									<p>
+										{% if orderdetail.product.id|check_product_sale %}
+											{{ orderdetail.product.id|get_price_sale|intcomma }} ₫
+											{% else %}
+											{{ orderdetail.product.price|intcomma }} ₫
+										{% endif %}
+									</p>
+								</td>
+								<td class="cart_quantity">
+									<div class="cart_quantity_button">
+										<input class="cart_quantity_input" disabled type="text" name="quantity" value="{{ orderdetail.quantity }}" autocomplete="off" size="2">
+									</div>
+								</td>
+								<td class="cart_total">
+									<p class="cart_total_price">{{ orderdetail.amount|intcomma }} ₫</p>
+								</td>
+							</tr>							
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</section> <!--/#cart_items-->
+{% endblock content %}
